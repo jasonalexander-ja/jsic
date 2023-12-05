@@ -35,9 +35,19 @@ and ResolvedList(t, values) =
     member this.Type: Type = t
     member this.Values: ResolvedValue list = values
 
+
 type Value = 
-    |FuncCall of string * Value list
+    |FuncCall of FunctionCall
+    |ValList of ValueList
     |ResolvedVal of ResolvedValue
+
+and FunctionCall(name, t, param) =
+    member this.Name: string = name
+    member this.Params: Value list = param
+
+and ValueList(t, values) = 
+    member this.Type: Type = t
+    member this.Values: Value list = values
 
 
 type Constant(name, value) = 
@@ -50,9 +60,11 @@ type Variable(name, t, value) =
     member this.Type: Type = t
     member this.Value: Value = value
 
+
 type ProcessNode = 
     |Var of Variable
     |Ret of Value
+
 
 type Function(name, t, param, consts, nodes, funcs) = 
 
@@ -109,6 +121,12 @@ type FuncTrace =
     |Root
     |Node of Function * FuncTrace
 
+    member this.PathName =
+        match this with
+        |Root -> ""
+        |Node (f, t) -> $".{f.Name}{t.PathName}"
+
+
 type FuncZipper(current, trace) = 
 
     member this.Current: Function = current
@@ -124,15 +142,16 @@ type FuncZipper(current, trace) =
         |None -> None
         |Some f -> Some(FuncZipper(f, Node(Function(this.Current, name), this.Trace)))
 
-    member this.GetValueLevel name: FuncZipper option = 
+    member this.GetValueLevel name = 
         match this.Current.GetValue name with
         |Some _ -> Some this
         |None -> this.Up |> Option.bind (fun f -> f.GetValueLevel name)
 
-    member this.GetFunctionLevel name: FuncZipper option = 
+    member this.GetFunctionLevel name = 
         match this.Current.Functions |> List.tryFind (fun f -> f.Name = name) with
         |Some _ -> Some this
         |None -> this.Up |> Option.bind (fun f -> f.GetValueLevel name)
+
 
 // For more information see https://aka.ms/fsharp-console-apps
 printfn "Hello from F#"

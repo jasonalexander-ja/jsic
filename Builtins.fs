@@ -17,7 +17,7 @@ let example = Function (
         []
     )
 
-let exampleZipper = FuncZipper(
+let exampleZipper = CallZipper (
     CallContext(
         "main",
         example,

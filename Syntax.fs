@@ -144,7 +144,7 @@ type CallTrace =
         |Node (f, t) -> $".{f.Name}{t.PathName}"
 
 
-type FuncZipper(current, trace) = 
+type CallZipper(current, trace) = 
 
     member this.Current: CallContext = current
     member this.Trace: CallTrace = trace
@@ -152,12 +152,12 @@ type FuncZipper(current, trace) =
     member this.Up =
         match this.Trace with 
         |Root -> None
-        |Node(p, t) -> Some (FuncZipper(CallContext(p, this.Current), t))
+        |Node(p, t) -> Some (CallZipper(CallContext(p, this.Current), t))
 
     member this.DownInto name =
         match this.Current.Children |> List.tryFind (fun f -> f.Name = name) with
         |None -> None
-        |Some f -> Some(FuncZipper(f, Node(CallContext(this.Current, name), this.Trace)))
+        |Some f -> Some(CallZipper(f, Node(CallContext(this.Current, name), this.Trace)))
 
     member this.GetValueLevel name = 
         match this.Current.GetValue name with

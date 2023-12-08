@@ -6,6 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Syntax.fs" />
+    <Compile Include="Builtins.fs" />
+    <Compile Include="Runtime.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 
